@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#0b0b10">
+  <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <title>AethoFlix</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg:#0b0b10; --surface:#17171f; --surface-2:#23232d; --text:#f7f7f9;
+      --muted:#b7b7c0; --line:rgba(255,255,255,.14); --accent:#e50914; --accent-2:#b20710;
+      --match:#46d369; --scrim:rgba(11,11,16,.76); --shadow:0 18px 52px rgba(0,0,0,.58);
+      --hero-scrim:linear-gradient(90deg,rgba(11,11,16,.98) 0%,rgba(11,11,16,.72) 43%,rgba(11,11,16,.16) 72%),linear-gradient(0deg,#0b0b10 0%,transparent 34%);
+    }
+    @media (prefers-color-scheme: light) {
+      :root { color-scheme:dark; }
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth;background:var(--bg)}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;min-width:320px;overflow-x:hidden}
+    button,input{font:inherit}
+    button{color:inherit}
+    img{display:block}
+    .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    .icon{width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+    .nav{position:fixed;z-index:80;top:0;left:0;right:0;height:68px;display:flex;align-items:center;gap:18px;padding:0 clamp(18px,4vw,64px);background:linear-gradient(180deg,rgba(5,5,8,.94),rgba(5,5,8,.45),transparent);transition:background .25s,border-color .25s;border-bottom:1px solid transparent;color:#fff}
+    .nav.solid{background:var(--scrim);backdrop-filter:blur(14px);border-color:var(--line);color:var(--text)}
+    .nav-links{display:flex;align-items:center;gap:6px;min-width:0}
+    .nav-link{border:0;background:transparent;color:inherit;padding:9px 12px;border-radius:6px;cursor:pointer;font-size:14px;font-weight:600;white-space:nowrap;opacity:.78}
+    .nav-link:hover,.nav-link:focus-visible,.nav-link.active{opacity:1;background:rgba(255,255,255,.1)}
+    .nav-spacer{flex:1}
+    .search-shell{position:relative;display:flex;align-items:center;height:40px}
+    .search-toggle{position:absolute;right:0;z-index:2;border:0;background:transparent;width:40px;height:40px;display:grid;place-items:center;cursor:pointer;border-radius:50%}
+    .search-toggle:hover,.search-toggle:focus-visible{background:rgba(255,255,255,.12)}
+    .search-input{width:40px;height:40px;border:1px solid transparent;border-radius:20px;background:transparent;color:inherit;outline:0;padding:0 42px 0 14px;opacity:0;visibility:hidden;cursor:pointer;transition:width .25s,opacity .2s,border-color .2s,background .2s}
+    .search-shell.open .search-input{width:min(320px,42vw);opacity:1;visibility:visible;cursor:text;border-color:var(--line);background:var(--surface)}
+    .search-input::placeholder{color:var(--muted)}
+    .hero{position:relative;min-height:630px;height:min(78vh,780px);display:flex;align-items:flex-end;overflow:hidden;color:#fff}
+    .hero-media{position:absolute;inset:0}
+    .hero-media img{width:100%;height:100%;object-fit:cover;object-position:center;transition:opacity .45s}
+    .hero-media::after{content:"";position:absolute;inset:0;background:var(--hero-scrim)}
+    .hero-copy{position:relative;z-index:2;width:min(690px,88vw);padding:0 0 116px clamp(20px,5vw,78px)}
+    .hero-kicker{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#fff}
+    .hero-kicker::before{content:"";width:30px;height:3px;background:var(--accent)}
+    .hero h1{font-size:clamp(40px,6.5vw,82px);line-height:.94;letter-spacing:-.055em;margin:18px 0 18px;max-width:680px;text-shadow:0 3px 18px rgba(0,0,0,.34)}
+    .hero-meta{display:flex;align-items:center;gap:12px;font-size:14px;font-weight:700;margin-bottom:15px}
+    .match{color:var(--match)}
+    .age{border:1px solid rgba(255,255,255,.55);padding:2px 6px;border-radius:3px}
+    .hero-overview{max-width:610px;font-size:clamp(15px,1.5vw,18px);line-height:1.58;margin:0 0 24px;color:#ededf2;text-shadow:0 2px 12px #000}
+    .actions{display:flex;flex-wrap:wrap;gap:10px}
+    .btn{border:0;border-radius:6px;padding:12px 18px;display:inline-flex;align-items:center;justify-content:center;gap:9px;font-weight:800;cursor:pointer;transition:background .2s,transform .2s;color:#fff}
+    .btn:hover{transform:translateY(-1px)}
+    .btn-primary{background:#fff;color:#101015}.btn-primary:hover{background:#dedee3}
+    .btn-secondary{background:rgba(90,90,98,.75);backdrop-filter:blur(8px)}.btn-secondary:hover{background:rgba(110,110,118,.85)}
+    .btn-accent{background:var(--accent)}.btn-accent:hover{background:var(--accent-2)}
+    .hero-controls{position:absolute;z-index:4;right:clamp(18px,4vw,64px);bottom:116px;display:flex;align-items:center;gap:10px}
+    .hero-arrow{width:42px;height:42px;border:1px solid rgba(255,255,255,.4);border-radius:50%;background:rgba(8,8,12,.36);color:#fff;display:grid;place-items:center;cursor:pointer;backdrop-filter:blur(8px)}
+    .hero-arrow:hover{background:rgba(8,8,12,.75)}
+    .dots{display:flex;gap:7px;padding:0 3px}
+    .dot{width:7px;height:7px;border:0;border-radius:50%;padding:0;background:rgba(255,255,255,.44);cursor:pointer;transition:width .2s,background .2s}
+    .dot.active{width:25px;border-radius:4px;background:var(--accent)}
+    .content{position:relative;z-index:5;margin-top:-70px;padding-bottom:36px}
+    .view-head{padding:110px clamp(18px,4vw,64px) 14px}
+    .view-head h1{font-size:clamp(34px,5vw,64px);letter-spacing:-.045em;margin:0 0 10px}
+    .view-head p{color:var(--muted);margin:0;line-height:1.5}
+    .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+    .chip{border:1px solid var(--line);background:var(--surface);padding:8px 12px;border-radius:999px;color:var(--text);cursor:pointer;font-size:13px;font-weight:700}
+    .chip:hover,.chip.active{background:var(--text);color:var(--bg);border-color:var(--text)}
+    .rows{display:flex;flex-direction:column;gap:31px}
+    .shelf{position:relative}
+    .shelf-heading{display:flex;align-items:baseline;justify-content:space-between;padding:0 clamp(18px,4vw,64px) 12px;gap:15px}
+    .shelf h2{font-size:clamp(19px,2vw,26px);letter-spacing:-.025em;margin:0}
+    .shelf-count{font-size:12px;color:var(--muted)}
+    .rail-wrap{position:relative}
+    .rail{display:grid;grid-auto-flow:column;grid-auto-columns:clamp(155px,17vw,232px);gap:10px;overflow-x:auto;overscroll-behavior-inline:contain;scroll-snap-type:x proximity;scrollbar-width:none;padding:3px clamp(18px,4vw,64px) 30px}
+    .rail::-webkit-scrollbar{display:none}
+    .rail-arrow{position:absolute;z-index:12;top:0;bottom:30px;width:48px;border:0;background:rgba(8,8,12,.7);color:#fff;display:grid;place-items:center;cursor:pointer;opacity:0;transition:opacity .2s}
+    .rail-wrap:hover .rail-arrow,.rail-arrow:focus-visible{opacity:1}
+    .rail-arrow.prev{left:0}.rail-arrow.next{right:0}
+    .card{position:relative;scroll-snap-align:start;background:var(--surface-2);border-radius:7px;overflow:hidden;aspect-ratio:2/3;box-shadow:0 2px 10px rgba(0,0,0,.16);cursor:pointer;isolation:isolate}
+    .card img{width:100%;height:100%;object-fit:cover;transition:transform .32s}
+    .card::after{content:"";position:absolute;inset:35% 0 0;background:linear-gradient(transparent,rgba(5,5,9,.98));opacity:.45;transition:opacity .25s}
+    .card:hover img,.card:focus-within img{transform:scale(1.035)}
+    .card:hover::after,.card:focus-within::after{opacity:1}
+    .card-info{position:absolute;z-index:2;left:0;right:0;bottom:0;padding:14px;transform:translateY(34px);transition:transform .25s;color:#fff}
+    .card:hover .card-info,.card:focus-within .card-info{transform:translateY(0)}
+    .card-title{font-size:14px;line-height:1.25;font-weight:800;margin:0 0 6px;text-shadow:0 1px 4px #000}
+    .card-meta{display:flex;gap:7px;font-size:11px;color:#ddd;align-items:center;margin-bottom:10px}
+    .card-actions{display:flex;gap:7px;opacity:0;transition:opacity .2s}
+    .card:hover .card-actions,.card:focus-within .card-actions{opacity:1}
+    .round-btn{width:33px;height:33px;border-radius:50%;border:1px solid rgba(255,255,255,.65);background:rgba(12,12,18,.74);color:#fff;display:grid;place-items:center;cursor:pointer;padding:0}
+    .round-btn:hover{background:#fff;color:#111}
+    .round-btn.in-list{background:var(--accent);border-color:var(--accent);color:#fff}
+    .card-fallback{background:radial-gradient(circle at 65% 20%,#3b3b48,#17171f 50%,#09090d)}
+    .top-card{aspect-ratio:auto;display:grid;grid-template-columns:minmax(76px,.72fr) minmax(110px,1fr);background:transparent;box-shadow:none;overflow:visible;border-radius:0;cursor:pointer}
+    .rank{font-weight:900;font-size:clamp(104px,13vw,176px);line-height:.88;letter-spacing:-.1em;color:var(--bg);-webkit-text-stroke:clamp(2px,.22vw,4px) var(--muted);text-shadow:3px 4px 0 var(--surface-2);align-self:end;text-align:right;padding-right:6px;z-index:-1}
+    .top-card .card{width:100%}
+    .grid-view{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;padding:12px clamp(18px,4vw,64px) 54px}
+    .empty{margin:26px clamp(18px,4vw,64px);border:1px dashed var(--line);padding:42px 24px;text-align:center;color:var(--muted);border-radius:10px}
+    .empty strong{color:var(--text);display:block;font-size:20px;margin-bottom:8px}
+    .search-panel{position:fixed;z-index:70;top:68px;left:0;right:0;max-height:min(74vh,720px);overflow-y:auto;background:var(--scrim);backdrop-filter:blur(20px);border-bottom:1px solid var(--line);box-shadow:var(--shadow);padding:20px clamp(18px,4vw,64px) 30px;display:none}
+    .search-panel.open{display:block}
+    .search-summary{margin:0 0 14px;color:var(--muted);font-size:14px}
+    .search-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:12px}
+    .search-grid .card-info{transform:translateY(0)}
+    .modal,.theatre{position:fixed;inset:0;z-index:120;display:none;background:rgba(3,3,6,.86);backdrop-filter:blur(10px);padding:clamp(10px,3vw,36px);overflow:auto}
+    .modal.open,.theatre.open{display:grid}
+    .modal{place-items:center}
+    .modal-card{width:min(930px,100%);background:var(--surface);box-shadow:var(--shadow);border-radius:10px;overflow:hidden;position:relative}
+    .modal-media{aspect-ratio:16/8.7;background:#050507;position:relative}
+    .modal-media iframe,.modal-media img{width:100%;height:100%;border:0;object-fit:cover}
+    .close-btn{position:absolute;z-index:4;top:14px;right:14px;width:42px;height:42px;border:0;border-radius:50%;background:rgba(8,8,12,.78);color:#fff;display:grid;place-items:center;cursor:pointer}
+    .modal-body{padding:clamp(20px,4vw,38px);display:grid;grid-template-columns:minmax(0,1.6fr) minmax(180px,.7fr);gap:32px}
+    .modal h2{font-size:clamp(28px,4vw,48px);letter-spacing:-.045em;margin:0 0 9px}
+    .modal-meta{display:flex;gap:10px;align-items:center;font-size:14px;font-weight:700;margin-bottom:18px}
+    .modal-overview{line-height:1.68;color:var(--muted);margin:0 0 22px}
+    .label{font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:800;color:var(--muted);margin-bottom:9px}
+    .genre-list{display:flex;flex-wrap:wrap;gap:7px}
+    .genre-tag{font-size:12px;background:var(--surface-2);padding:7px 9px;border-radius:4px}
+    .theatre{place-items:center;background:radial-gradient(circle at 50% 20%,#24242d,#050507 58%);padding:0}
+    .cinema{width:100%;height:100%;display:grid;grid-template-rows:1fr auto;place-items:center;perspective:1100px;position:relative;overflow:hidden}
+    .screen-wrap{width:min(84vw,1200px);aspect-ratio:16/9;transform:rotateX(-1.5deg);box-shadow:0 0 0 9px #1b1b20,0 0 0 11px #555,0 30px 100px rgba(229,9,20,.18);background:#000;position:relative}
+    .screen-wrap::after{content:"";position:absolute;inset:auto 8% -34% 8%;height:30%;background:linear-gradient(rgba(229,9,20,.11),transparent);filter:blur(18px);transform:rotateX(70deg);pointer-events:none}
+    .screen-wrap iframe{width:100%;height:100%;border:0}
+    .seats{height:92px;width:94vw;background:repeating-radial-gradient(ellipse at 50% 110%,#281116 0 13px,#0a090c 14px 31px);opacity:.82;mask-image:linear-gradient(transparent,#000 48%)}
+    .theatre-label{position:absolute;top:22px;left:24px;color:#fff;font-size:13px;font-weight:700;letter-spacing:.04em}
+    .theatre .close-btn{position:fixed}
+    footer{border-top:1px solid var(--line);padding:34px clamp(18px,4vw,64px) 48px;color:var(--muted);font-size:12px;line-height:1.7;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+    footer a{color:inherit}
+    .reduced-note{font-size:13px;color:var(--muted);margin-top:6px}
+    :focus-visible{outline:4px solid #fff;outline-offset:4px;box-shadow:0 0 0 8px var(--accent),0 8px 28px rgba(0,0,0,.72);position:relative;z-index:40}
+    .card:focus-visible{outline-width:5px;outline-offset:5px;box-shadow:0 0 0 10px var(--accent),0 18px 42px rgba(0,0,0,.82)}
+    .card:focus-visible img{transform:scale(1.035)}
+    .card:focus-visible::after{opacity:1}
+    .card:focus-visible .card-info{transform:translateY(0)}
+    .card:focus-visible .card-actions{opacity:1}
+    .search-input:focus-visible{outline-offset:2px}
+    @media (forced-colors:active){:focus-visible{outline:5px solid Highlight;box-shadow:none}}
+    @media (max-width:760px){
+      .nav{height:60px;padding:0 12px;gap:4px;background:rgba(7,7,10,.9);overflow:visible}
+      .nav-links{gap:0;overflow-x:auto;scrollbar-width:none;padding-right:42px}
+      .nav-link{font-size:12px;padding:8px 9px}
+      .search-shell{position:absolute;right:10px}
+      .search-shell:not(.open) .search-input{display:none}
+      .search-shell.open{left:10px;right:10px;z-index:5;background:var(--surface)}
+      .search-shell.open .search-input{display:block;width:100%;max-width:none;background:var(--surface)}
+      .hero{height:auto;min-height:680px;align-items:flex-end}
+      .hero-media img{object-position:62% center}
+      .hero-media::after{background:linear-gradient(0deg,var(--bg) 1%,rgba(8,8,12,.86) 43%,rgba(8,8,12,.18) 80%)}
+      .hero-copy{padding:0 18px 90px;width:100%}
+      .hero h1{font-size:46px;max-width:94%}
+      .hero-overview{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;font-size:14px}
+      .hero-controls{left:18px;right:18px;bottom:22px;justify-content:space-between}
+      .hero-controls .hero-arrow{display:grid;width:40px;height:40px;flex:0 0 40px}
+      .dots{flex:1;justify-content:center}
+      .dot{width:10px;height:10px}.dot.active{width:28px}
+      .content{margin-top:0}.rows{gap:25px}
+      .rail{grid-auto-flow:row;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-columns:unset;overflow:visible;padding:3px 14px 18px;gap:9px}
+      .rail>*:nth-child(n+7){display:none}
+      .rail-arrow{display:none}
+      .shelf-heading{padding:0 14px 10px}
+      .top-card{grid-template-columns:minmax(55px,.65fr) minmax(100px,1fr)}
+      .top-card:nth-child(n+7){display:none}
+      .rank{font-size:25vw}
+      .grid-view{grid-template-columns:repeat(2,minmax(0,1fr));padding:10px 14px 44px;gap:9px}
+      .card-info{transform:translateY(0);padding:11px}.card-actions{opacity:1}.card-title{font-size:12px}.card-meta{font-size:10px}
+      .round-btn{width:30px;height:30px}.round-btn .icon{width:16px;height:16px}
+      .view-head{padding:90px 14px 12px}.view-head h1{font-size:38px}
+      .search-panel{top:60px;padding:16px 14px 24px}.search-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+      .modal{padding:0;place-items:end center;background:rgba(3,3,6,.9)}
+      .modal-card{border-radius:12px 12px 0 0;max-height:94vh;overflow:auto}
+      .modal-media{aspect-ratio:16/9}
+      .modal-body{grid-template-columns:1fr;gap:22px;padding:20px}
+      .screen-wrap{width:96vw}
+      .theatre-label{top:14px;left:14px;max-width:70%;font-size:11px}
+      footer{padding:28px 14px 40px}
+    }
+    @media (prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <nav class="nav" id="nav" aria-label="Browse">
+    <div class="nav-links">
+      <button class="nav-link active" data-view="home">Home</button>
+      <button class="nav-link" data-view="movie">Movies</button>
+      <button class="nav-link" data-view="tv">TV Shows</button>
+      <button class="nav-link" data-view="list">My List</button>
+    </div>
+    <div class="nav-spacer"></div>
+    <div class="search-shell" id="searchShell">
+      <label class="sr-only" for="searchInput">Search titles</label>
+      <input class="search-input" id="searchInput" type="search" autocomplete="off" tabindex="-1" placeholder="Titles, genres, years">
+      <button class="search-toggle" id="searchToggle" aria-label="Open search" aria-expanded="false">
+        <svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg>
+      </button>
+    </div>
+  </nav>
+
+  <div id="app"></div>
+  <section class="search-panel" id="searchPanel" aria-live="polite">
+    <p class="search-summary" id="searchSummary"></p>
+    <div class="search-grid" id="searchGrid"></div>
+  </section>
+
+  <div class="modal" id="detailModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <article class="modal-card" id="modalCard"></article>
+  </div>
+
+  <div class="theatre" id="theatre" role="dialog" aria-modal="true" aria-label="3D Theatre">
+    <div class="cinema">
+      <div class="theatre-label" id="theatreLabel"></div>
+      <button class="close-btn" id="theatreClose" aria-label="Exit theatre"><svg class="icon"><use href="#i-x"></use></svg></button>
+      <div class="screen-wrap" id="screenWrap"></div>
+      <div class="seats" aria-hidden="true"></div>
+    </div>
+  </div>
+
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7z"></path></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v6M12 7h.01"></path></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4 10-10"></path></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></symbol>
+    <symbol id="i-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"></path></symbol>
+    <symbol id="i-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"></path></symbol>
+    <symbol id="i-theatre" viewBox="0 0 24 24"><path d="M3 6h18v12H3z"></path><path d="M7 21h10M12 18v3"></path></symbol>
+  </svg>
+
+  <script>
+  const catalog = [{"id":66732,"kind":"tv","title":"Stranger Things","year":2016,"overview":"When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces, and one strange little girl.","poster":"https://media.themoviedb.org/t/p/w500/uOOtwVbSr4QDjAGIifLDwpb2Pdl.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/9P4IIMYY3HifqeruZq0ZZ9g7YUi.jpg","rating":8.5,"genres":["Action Adventure","Mystery","Sci Fi Fantasy"],"trailer":"b9EkMc79ZSU"},{"id":119051,"kind":"tv","title":"Wednesday","year":2022,"overview":"Smart, sarcastic and a little dead inside, Wednesday Addams investigates twisted mysteries while making new friends — and foes — at Nevermore Academy.","poster":"https://media.themoviedb.org/t/p/w500/9PFonBhy4cQy7Jz20NpMygczOkv.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/iHSwvRVsRyxpX7FE7GbviaDvgGZ.jpg","rating":8.3,"genres":["Sci Fi Fantasy","Mystery","Comedy"],"trailer":"Qa5kFRxBkNw"},{"id":100088,"kind":"tv","title":"The Last of Us","year":2023,"overview":"Twenty years after modern civilization has been destroyed, Joel, a hardened survivor, is hired to smuggle Ellie, a 14-year-old girl, out of an oppressive quarantine zone. What starts as a small job soon becomes a brutal, heartbreaking journey, as they both must traverse the United States and depend on each other for survival.","poster":"https://media.themoviedb.org/t/p/w500/dmo6TYuuJgaYinXBPjrgG9mB5od.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/lY2DhbA7Hy44fAKddr06UrXWWaQ.jpg","rating":8.4,"genres":["Drama"],"trailer":"uLtkt8BonwM"},{"id":1396,"kind":"tv","title":"Breaking Bad","year":2008,"overview":"Walter White, a New Mexico chemistry teacher, is diagnosed with Stage III cancer and given a prognosis of only two years left to live. He becomes filled with a sense of fearlessness and an unrelenting desire to secure his family's financial future at any cost as he enters the dangerous world of drugs and crime.","poster":"https://media.themoviedb.org/t/p/w500/anFx9aTOOYqgS3v7x3R84Kz67ly.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/tsRy63Mu5cu8etL1X7ZLyf7UP1M.jpg","rating":9.0,"genres":["Drama","Crime"],"trailer":null},{"id":71446,"kind":"tv","title":"Money Heist","year":2017,"overview":"To carry out the biggest heist in history, a mysterious man called The Professor recruits a band of eight robbers who have a single characteristic: none of them has anything to lose. Five months of seclusion - memorizing every step, every detail, every probability - culminate in eleven days locked up in the National Coinage and Stamp Factory of Spain, surrounded by police forces and with dozens of hostages in their power, to find out whether their suicide wager will lead to everything or nothing.","poster":"https://media.themoviedb.org/t/p/w500/reEMJA1uzscCbkpeRJeTT2bjqUp.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/gFZriCkpJYsApPZEF3jhxL4yLzG.jpg","rating":8.2,"genres":["Crime","Drama"],"trailer":"_InqQJRqGW4"},{"id":93405,"kind":"tv","title":"Squid Game","year":2021,"overview":"Hundreds of cash-strapped players accept a strange invitation to compete in children's games. Inside, a tempting prize awaits — with deadly high stakes.","poster":"https://media.themoviedb.org/t/p/w500/1QdXdRYfktUSONkl1oD5gc6Be0s.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/2meX1nMdScFOoV4370rqHWKmXhY.jpg","rating":7.9,"genres":["Action Adventure","Mystery","Drama"],"trailer":"oqxAJKy0ii4"},{"id":76479,"kind":"tv","title":"The Boys","year":2019,"overview":"A group of vigilantes known informally as “The Boys” set out to take down corrupt superheroes with no more than blue-collar grit and a willingness to fight dirty.","poster":"https://media.themoviedb.org/t/p/w500/in1R2dDc421JxsoRWaIIAqVI2KE.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/bq28ajZaoMyzEIm6REelqyqtEDZ.jpg","rating":8.4,"genres":["Sci Fi Fantasy","Action Adventure"],"trailer":"CD46c08MsHg"},{"id":84958,"kind":"tv","title":"Loki","year":2021,"overview":"After stealing the Tesseract during the events of “Avengers: Endgame,” an alternate version of Loki is brought to the mysterious Time Variance Authority, a bureaucratic organization that exists outside of time and space and monitors the timeline. They give Loki a choice: face being erased from existence due to being a “time variant” or help fix the timeline and stop a greater threat.","poster":"https://media.themoviedb.org/t/p/w500/kEl2t3OhXc3Zb9FBh1AuYzRTgZp.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/q3jHCb4dMfYF6ojikKuHd6LscxC.jpg","rating":8.2,"genres":["Drama","Sci Fi Fantasy"],"trailer":"G4JuopziR3Q"},{"id":71912,"kind":"tv","title":"The Witcher","year":2019,"overview":"Geralt of Rivia, a mutated monster-hunter for hire, journeys toward his destiny in a turbulent world where people often prove more wicked than beasts.","poster":"https://media.themoviedb.org/t/p/w500/AoGsDM02UVt0npBA8OvpDcZbaMi.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/foGkPxpw9h8zln81j63mix5B7m8.jpg","rating":7.9,"genres":["Sci Fi Fantasy","Drama","Action Adventure"],"trailer":"ndl1W4ltcmg"},{"id":94997,"kind":"tv","title":"House of the Dragon","year":2022,"overview":"The Targaryen dynasty is at the absolute apex of its power, with more than 15 dragons under their yoke. Most empires crumble from such heights. In the case of the Targaryens, their slow fall begins when King Viserys breaks with a century of tradition by naming his daughter Rhaenyra heir to the Iron Throne. But when Viserys later fathers a son, the court is shocked when Rhaenyra retains her status as his heir, and seeds of division sow friction across the realm.","poster":"https://media.themoviedb.org/t/p/w500/7V0Ebks0GgpKvQ7QbLAIdX5dos4.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/577eXC8wFQT0eUrJcgznSiFPRmk.jpg","rating":8.4,"genres":["Sci Fi Fantasy","Drama","Action Adventure"],"trailer":"Wg86eQkdudI"},{"id":106379,"kind":"tv","title":"Fallout","year":2024,"overview":"The story of haves and have-nots in a world in which there's almost nothing left to have. 200 years after the apocalypse, the gentle denizens of luxury fallout shelters are forced to return to the irradiated hellscape their ancestors left behind — and are shocked to discover an incredibly complex, gleefully weird, and highly violent universe waiting for them.","poster":"https://media.themoviedb.org/t/p/w500/c15BtJxCXMrISLVmysdsnZUPQft.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/coaPCIqQBPUZsOnJcWZxhaORcDT.jpg","rating":8.1,"genres":["Action Adventure","Sci Fi Fantasy","Drama"],"trailer":"0kQ8i2FpRDk"},{"id":136315,"kind":"tv","title":"The Bear","year":2022,"overview":"Carmy, a young fine-dining chef, comes home to Chicago to run his family sandwich shop. As he fights to transform the shop and himself, he works alongside a rough-around-the-edges crew that ultimately reveal themselves as his chosen family.","poster":"https://media.themoviedb.org/t/p/w500/eKfVzzEazSIjJMrw9ADa2x8ksLz.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/aJtG4txtmiRHwAAqENQHZvBs6kY.jpg","rating":8.2,"genres":["Drama","Comedy"],"trailer":"WBlIUsFEnsw"},{"id":299534,"kind":"movie","title":"Avengers: Endgame","year":2019,"overview":"After the devastating events of Avengers: Infinity War, the universe is in ruins due to the efforts of the Mad Titan, Thanos. With the help of remaining allies, the Avengers must assemble once more in order to undo Thanos' actions and restore order to the universe once and for all, no matter what consequences may be in store.","poster":"https://media.themoviedb.org/t/p/w500/ulzhLuWrPK07P1YkdWQLZnQh1JL.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/7RyHsO4yDXtBv1zUU3mTpHeQ0d5.jpg","rating":8.2,"genres":["Adventure","Science Fiction","Action"],"trailer":"hA6hldpSTF8"},{"id":155,"kind":"movie","title":"The Dark Knight","year":2008,"overview":"Batman raises the stakes in his war on crime. With the help of Lt. Jim Gordon and District Attorney Harvey Dent, Batman sets out to dismantle the remaining criminal organizations that plague the streets. The partnership proves to be effective, but they soon find themselves prey to a reign of chaos unleashed by a rising criminal mastermind known to the terrified citizens of Gotham as the Joker.","poster":"https://media.themoviedb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/9FE5eD92WfVCiivM9Pq9GVSrlWk.jpg","rating":8.5,"genres":["Action","Thriller","Crime"],"trailer":"kmJLuwP3MbY"},{"id":27205,"kind":"movie","title":"Inception","year":2010,"overview":"Cobb, a skilled thief who commits corporate espionage by infiltrating the subconscious of his targets is offered a chance to regain his old life as payment for a task considered to be impossible: \"inception\", the implantation of another person's idea into a target's subconscious.","poster":"https://media.themoviedb.org/t/p/w500/xlaY2zyzMfkhk0HSC5VUwzoZPU1.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/8ZTVqvKDQ8emSGUEMjsS4yHAwrp.jpg","rating":8.4,"genres":["Action","Science Fiction","Adventure"],"trailer":"Jvurpf91omw"},{"id":157336,"kind":"movie","title":"Interstellar","year":2014,"overview":"The adventures of a group of explorers who make use of a newly discovered wormhole to surpass the limitations on human space travel and conquer the vast distances involved in an interstellar voyage.","poster":"https://media.themoviedb.org/t/p/w500/yQvGrMoipbRoddT0ZR8tPoR7NfX.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/8sNiAPPYU14PUepFNeSNGUTiHW.jpg","rating":8.5,"genres":["Adventure","Drama","Science Fiction"],"trailer":"827FNDpQWrQ"},{"id":693134,"kind":"movie","title":"Dune: Part Two","year":2024,"overview":"Follow the mythic journey of Paul Atreides as he unites with Chani and the Fremen while on a path of revenge against the conspirators who destroyed his family. Facing a choice between the love of his life and the fate of the known universe, Paul endeavors to prevent a terrible future only he can foresee.","poster":"https://media.themoviedb.org/t/p/w500/6izwz7rsy95ARzTR3poZ8H6c5pp.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/eZ239CUp1d6OryZEBPnO2n87gMG.jpg","rating":8.1,"genres":["Science Fiction","Adventure"],"trailer":"Way9Dexny3w"},{"id":438631,"kind":"movie","title":"Dune","year":2021,"overview":"Paul Atreides, a brilliant and gifted young man born into a great destiny beyond his understanding, must travel to the most dangerous planet in the universe to ensure the future of his family and his people. As malevolent forces explode into conflict over the planet's exclusive supply of the most precious resource in existence - a commodity capable of unlocking humanity's greatest potential - only those who can conquer their fear will survive.","poster":"https://media.themoviedb.org/t/p/w500/v1tRXZ4JtD2Iv6fjkPvT4GiwslV.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/zRKQW58MBEY078AxkHxEJzUskCl.jpg","rating":7.8,"genres":["Science Fiction","Adventure"],"trailer":"n9xhJrPXop4"},{"id":872585,"kind":"movie","title":"Oppenheimer","year":2023,"overview":"The story of J. Robert Oppenheimer's role in the development of the atomic bomb during World War II.","poster":"https://media.themoviedb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/neeNHeXjMF5fXoCJRsOmkNGC7q.jpg","rating":8.0,"genres":["Drama","History"],"trailer":"bK6ldnjE3Y0"},{"id":346698,"kind":"movie","title":"Barbie","year":2023,"overview":"Barbie and Ken are having the time of their lives in the colorful and seemingly perfect world of Barbie Land. However, when they get a chance to go to the real world, they soon discover the joys and perils of living among humans.","poster":"https://media.themoviedb.org/t/p/w500/iuFNMS8U5cb6xfzi51Dbkovj7vM.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/1esAE8sLJRWWFsLLeh5r3g2WanI.jpg","rating":6.9,"genres":["Comedy","Adventure","Fantasy"],"trailer":"8zIf0XvoL9Y"},{"id":634649,"kind":"movie","title":"Spider-Man: No Way Home","year":2021,"overview":"Peter Parker is unmasked and no longer able to separate his normal life from the high-stakes of being a super-hero. When he asks for help from Doctor Strange the stakes become even more dangerous, forcing him to discover what it truly means to be Spider-Man.","poster":"https://media.themoviedb.org/t/p/w500/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/iQFcwSGbZXMkeyKrxbPnwnRo5fl.jpg","rating":7.9,"genres":["Action","Adventure","Science Fiction"],"trailer":"WgU7P6o-GkM"},{"id":414906,"kind":"movie","title":"The Batman","year":2022,"overview":"In his second year of fighting crime, Batman uncovers corruption in Gotham City that connects to his own family while facing a serial killer known as the Riddler.","poster":"https://media.themoviedb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/rvtdN5XkWAfGX6xDuPL6yYS2seK.jpg","rating":7.7,"genres":["Crime","Mystery","Thriller"],"trailer":"mqqft2x_Aa4"},{"id":603692,"kind":"movie","title":"John Wick: Chapter 4","year":2023,"overview":"With the price on his head ever increasing, John Wick uncovers a path to defeating The High Table. But before he can earn his freedom, Wick must face off against a new enemy with powerful alliances across the globe and forces that turn old friends into foes.","poster":"https://media.themoviedb.org/t/p/w500/vZloFAK7NmvMGKE7VkF5UHaz0I.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/7I6VUdPj6tQECNHdviJkUHD2u89.jpg","rating":7.7,"genres":["Action","Thriller","Crime"],"trailer":"qEVUtrk8_B4"},{"id":76600,"kind":"movie","title":"Avatar: The Way of Water","year":2022,"overview":"Set more than a decade after the events of the first film, learn the story of the Sully family (Jake, Neytiri, and their kids), the trouble that follows them, the lengths they go to keep each other safe, the battles they fight to stay alive, and the tragedies they endure.","poster":"https://media.themoviedb.org/t/p/w500/t6HIqrRAclMCA60NsSmeqe9RmNV.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/kJsPVzdyBrYHLomuNv5SJDXUQ2f.jpg","rating":7.6,"genres":["Action","Adventure","Science Fiction"],"trailer":"a8Gx8wiNbs8"},{"id":361743,"kind":"movie","title":"Top Gun: Maverick","year":2022,"overview":"After more than thirty years of service as one of the Navy’s top aviators, and dodging the advancement in rank that would ground him, Pete “Maverick” Mitchell finds himself training a detachment of TOP GUN graduates for a specialized mission the likes of which no living pilot has ever seen.","poster":"https://media.themoviedb.org/t/p/w500/n0YuM4f5lvGAP6MAW2kBIzugXnc.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/AaV1YIdWKnjAIAOe8UUKBFm327v.jpg","rating":8.2,"genres":["Action","Drama"],"trailer":"qSqVVswa420"},{"id":475557,"kind":"movie","title":"Joker","year":2019,"overview":"During the 1980s, a failed stand-up comedian is driven insane and turns to a life of crime and chaos in Gotham City while becoming an infamous psychopathic crime figure.","poster":"https://media.themoviedb.org/t/p/w500/udDclJoHjfjb8Ekgsd4FDteOkCU.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/rlay2M5QYvi6igbGcFjq8jxeusY.jpg","rating":8.1,"genres":["Crime","Thriller","Drama"],"trailer":"t433PEQGErc"},{"id":533535,"kind":"movie","title":"Deadpool & Wolverine","year":2024,"overview":"A listless Wade Wilson toils away in civilian life with his days as the morally flexible mercenary, Deadpool, behind him. But when his homeworld faces an existential threat, Wade must reluctantly suit-up again with an even more reluctant Wolverine.","poster":"https://media.themoviedb.org/t/p/w500/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/by8z9Fe8y7p4jo2YlW2SZDnptyT.jpg","rating":7.6,"genres":["Action","Comedy","Science Fiction"],"trailer":"73_1biulkYk"},{"id":1022789,"kind":"movie","title":"Inside Out 2","year":2024,"overview":"Teenager Riley's mind headquarters is undergoing a sudden demolition to make room for something entirely unexpected: new Emotions! Joy, Sadness, Anger, Fear and Disgust, who’ve long been running a successful operation by all accounts, aren’t sure how to feel when Anxiety shows up. And it looks like she’s not alone.","poster":"https://media.themoviedb.org/t/p/w500/vpnVM9B6NMmQpWeZvzLvDESb2QY.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/p5ozvmdgsmbWe0H8Xk7Rc8SCwAB.jpg","rating":7.5,"genres":["Animation","Adventure","Comedy","Family"],"trailer":"VWavstJydZU"},{"id":1241982,"kind":"movie","title":"Moana 2","year":2024,"overview":"After receiving an unexpected call from her wayfinding ancestors, Moana journeys alongside Maui and a new crew to the far seas of Oceania and into dangerous, long-lost waters for an adventure unlike anything she's ever faced.","poster":"https://media.themoviedb.org/t/p/w500/aLVkiINlIeCkcZIzb7XHzPYgO6L.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/vYqt6kb4lcF8wwqsMMaULkP9OEn.jpg","rating":7.0,"genres":["Adventure","Animation","Comedy","Family"],"trailer":"qkgkUCqEum4"},{"id":1184918,"kind":"movie","title":"The Wild Robot","year":2024,"overview":"After a shipwreck, an intelligent robot called Roz is stranded on an uninhabited island. To survive the harsh environment, Roz bonds with the island's animals and cares for an orphaned baby goose.","poster":"https://media.themoviedb.org/t/p/w500/wTnV3PCVW5O92JMrFvvrRcV39RU.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/1pmXyN3sKeYoUhu5VBZiDU4BX21.jpg","rating":8.3,"genres":["Family","Animation","Science Fiction","Adventure"],"trailer":"67vbA5ZJdKQ"},{"id":1011985,"kind":"movie","title":"Kung Fu Panda 4","year":2024,"overview":"Po is gearing up to become the spiritual leader of his Valley of Peace, but also needs someone to take his place as Dragon Warrior. As such, he will train a new kung fu practitioner for the spot and will encounter a villain called the Chameleon who conjures villains from the past.","poster":"https://media.themoviedb.org/t/p/w500/kDp1vUBnMpe8ak4rjgl3cLELqjU.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/3ffPx9jqg0yj9y1KWeagT7D20CB.jpg","rating":7.0,"genres":["Animation","Comedy","Adventure","Action"],"trailer":"_inKs4eeHiI"},{"id":823464,"kind":"movie","title":"Godzilla x Kong: The New Empire","year":2024,"overview":"Following their explosive showdown, Godzilla and Kong must reunite against a colossal undiscovered threat hidden within our world, challenging their very existence – and our own.","poster":"https://media.themoviedb.org/t/p/w500/z1p34vh7dEOnLDmyCrlUVLuoDzd.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/gvLG3Fnznkxl4SmYfcK8gUuqxM8.jpg","rating":7.0,"genres":["Action","Adventure","Science Fiction"],"trailer":"lV1OOlGwExM"},{"id":653346,"kind":"movie","title":"Kingdom of the Planet of the Apes","year":2024,"overview":"Several generations following Caesar's reign, apes – now the dominant species – live harmoniously while humans have been reduced to living in the shadows. As a new tyrannical ape leader builds his empire, one young ape undertakes a harrowing journey that will cause him to question all he's known about the past and to make choices that will define a future for apes and humans alike.","poster":"https://media.themoviedb.org/t/p/w500/gKkl37BQuKTanygYQG1pyYgLVgf.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/fypydCipcWDKDTTCoPucBsdGYXW.jpg","rating":7.1,"genres":["Science Fiction","Adventure","Action"],"trailer":"NQ_HvTBaFoo"},{"id":786892,"kind":"movie","title":"Furiosa: A Mad Max Saga","year":2024,"overview":"As the world falls, young Furiosa is snatched from the Green Place of Many Mothers into the hands of a great biker horde led by the warlord Dementus. Sweeping through the wasteland, they encounter the citadel presided over by Immortan Joe. The two tyrants wage war for dominance, and Furiosa must survive many trials as she puts together the means to find her way home.","poster":"https://media.themoviedb.org/t/p/w500/iADOJ8Zymht2JPMoy3R7xceZprc.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/raph7qjAGTMXaIjVxt6ZDSXRzUr.jpg","rating":7.4,"genres":["Action","Science Fiction","Adventure"],"trailer":"XJMuhwVlca4"},{"id":746036,"kind":"movie","title":"The Fall Guy","year":2024,"overview":"Fresh off an almost career-ending accident, stuntman Colt Seavers has to track down a missing movie star, solve a conspiracy and try to win back the love of his life while still doing his day job.","poster":"https://media.themoviedb.org/t/p/w500/e7olqFmzcIX5c23kX4zSmLPJi8c.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/2rjI2uXmjitMAaXVO21r9ao7v2j.jpg","rating":6.9,"genres":["Action","Comedy","Romance"],"trailer":"j7jPnwVGdZ8"},{"id":718821,"kind":"movie","title":"Twisters","year":2024,"overview":"As storm season intensifies, the paths of former storm chaser Kate Carter and reckless social-media superstar Tyler Owens collide when terrifying phenomena never seen before are unleashed. The pair and their competing teams find themselves squarely in the paths of multiple storm systems converging over central Oklahoma in the fight of their lives.","poster":"https://media.themoviedb.org/t/p/w500/pjnD08FlMAIXsfOLKQbvmO0f0MD.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/58D6ZAvOKxlHjyX9S8qNKSBE9Y.jpg","rating":6.8,"genres":["Action","Thriller"],"trailer":"wdok0rZdmx4"},{"id":945961,"kind":"movie","title":"Alien: Romulus","year":2024,"overview":"While scavenging the deep ends of a derelict space station, a group of young space colonizers come face to face with the most terrifying life form in the universe.","poster":"https://media.themoviedb.org/t/p/w500/2uSWRTtCG336nuBiG8jOTEUKSy8.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/iYqSQaWDttQIQzsxg9xHyg0bttG.jpg","rating":7.2,"genres":["Horror","Science Fiction"],"trailer":"OzY2r2JXsDM"},{"id":762441,"kind":"movie","title":"A Quiet Place: Day One","year":2024,"overview":"As New York City is invaded by alien creatures who hunt by sound, a woman named Sam fights to survive with her cat.","poster":"https://media.themoviedb.org/t/p/w500/hU42CRk14JuPEdqZG3AWmagiPAP.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/6XjMwQTvnICBz6TguiDKkDVHvgS.jpg","rating":6.6,"genres":["Horror","Science Fiction","Thriller"],"trailer":"YPY7J-flzE8"},{"id":912649,"kind":"movie","title":"Venom: The Last Dance","year":2024,"overview":"Eddie and Venom are on the run. Hunted by both of their worlds and with the net closing in, the duo are forced into a devastating decision that will bring the curtains down on Venom and Eddie's last dance.","poster":"https://media.themoviedb.org/t/p/w500/vGXptEdgZIhPg3cGlc7e8sNPC2e.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/3V4kLQg0kSqPLctI5ziYWabAZYF.jpg","rating":6.7,"genres":["Science Fiction","Action","Adventure"],"trailer":"__2bjWbetsA"},{"id":558449,"kind":"movie","title":"Gladiator II","year":2024,"overview":"Years after witnessing the death of the revered hero Maximus at the hands of his uncle, Lucius is forced to enter the Colosseum after his home is conquered by the tyrannical Emperors who now lead Rome with an iron fist. With rage in his heart and the future of the Empire at stake, Lucius must look to his past to find strength and honor to return the glory of Rome to its people.","poster":"https://media.themoviedb.org/t/p/w500/2cxhvwyEwRlysAmRH4iodkvo0z5.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/tOqIwliWMovSIZ9DyvHcHI7p2im.jpg","rating":6.6,"genres":["Action","Adventure","Drama"],"trailer":"4rgYUipGJNo"},{"id":402431,"kind":"movie","title":"Wicked","year":2024,"overview":"In the land of Oz, ostracized and misunderstood green-skinned Elphaba is forced to share a room with the popular aristocrat Glinda at Shiz University, and the two's unlikely friendship is tested as they begin to fulfill their respective destinies as Glinda the Good and the Wicked Witch of the West.","poster":"https://media.themoviedb.org/t/p/w500/xDGbZ0JJ3mYaGKy4Nzd9Kph6M9L.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/w22GVYotTIVC1dUd58mRhwPqiS.jpg","rating":6.9,"genres":["Drama","Romance","Fantasy"],"trailer":"6COmYeLsz4c"},{"id":939243,"kind":"movie","title":"Sonic the Hedgehog 3","year":2024,"overview":"Sonic, Knuckles, and Tails reunite against a powerful new adversary, Shadow, a mysterious villain with powers unlike anything they have faced before. With their abilities outmatched in every way, Team Sonic must seek out an unlikely alliance in hopes of stopping Shadow and protecting the planet.","poster":"https://media.themoviedb.org/t/p/w500/d8Ryb8AunYAuycVKDp5HpdWPKgC.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/zOpe0eHsq0A2NvNyBbtT6sj53qV.jpg","rating":7.6,"genres":["Action","Science Fiction","Comedy","Family"],"trailer":"qSu6i2iFMO0"},{"id":762509,"kind":"movie","title":"Mufasa: The Lion King","year":2024,"overview":"Mufasa, a cub lost and alone, meets a sympathetic lion named Taka, the heir to a royal bloodline. The chance meeting sets in motion an expansive journey of a group of misfits searching for their destiny.","poster":"https://media.themoviedb.org/t/p/w500/jbOSUAWMGzGL1L4EaUF8K6zYFo7.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/1w8kutrRucTd3wlYyu5QlUDMiG1.jpg","rating":7.3,"genres":["Adventure","Family","Animation"],"trailer":"MjQG-a7d41Q"},{"id":426063,"kind":"movie","title":"Nosferatu","year":2024,"overview":"A gothic tale of obsession between a haunted young woman and the terrifying vampire infatuated with her, causing untold horror in its wake.","poster":"https://media.themoviedb.org/t/p/w500/5qGIxdEO841C0tdY8vOdLoRVrr0.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/gprjiZWY43vxSKngMha1wfb5TGG.jpg","rating":6.7,"genres":["Horror","Fantasy"],"trailer":"b59rxDB_JRg"},{"id":545611,"kind":"movie","title":"Everything Everywhere All at Once","year":2022,"overview":"An aging Chinese immigrant is swept up in an insane adventure, where she alone can save what's important to her by connecting with the lives she could have led in other universes.","poster":"https://media.themoviedb.org/t/p/w500/u68AjlvlutfEIcpmbYpKcdi09ut.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/fIwiFha3WPu5nHkBeMQ4GzEk0Hv.jpg","rating":7.7,"genres":["Action","Adventure","Science Fiction"],"trailer":"wxN1T1uxQ2g"},{"id":502356,"kind":"movie","title":"The Super Mario Bros. Movie","year":2023,"overview":"While working underground to fix a water main, Brooklyn plumbers—and brothers—Mario and Luigi are transported down a mysterious pipe and wander into a magical new world. But when the brothers are separated, Mario embarks on an epic quest to find Luigi.","poster":"https://media.themoviedb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/9n2tJBplPbgR2ca05hS5CKXwP2c.jpg","rating":7.6,"genres":["Family","Comedy","Adventure","Fantasy"],"trailer":"KydqdKKyGEk"},{"id":447365,"kind":"movie","title":"Guardians of the Galaxy Vol. 3","year":2023,"overview":"Peter Quill, still reeling from the loss of Gamora, must rally his team around him to defend the universe along with protecting one of their own. A mission that, if not completed successfully, could quite possibly lead to the end of the Guardians as we know them.","poster":"https://media.themoviedb.org/t/p/w500/r2J02Z2OpNTctfOSN1Ydgii51I3.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/5YZbUmjbMa3ClvSW1Wj3D6XGolb.jpg","rating":7.9,"genres":["Science Fiction","Adventure","Action"],"trailer":"u3V5KDHRQvk"},{"id":575264,"kind":"movie","title":"Mission: Impossible - Dead Reckoning Part One","year":2023,"overview":"Ethan Hunt and his IMF team embark on their most dangerous mission yet: To track down a terrifying new weapon that threatens all of humanity before it falls into the wrong hands. With control of the future and the world's fate at stake and dark forces from Ethan's past closing in, a deadly race around the globe begins. Confronted by a mysterious, all-powerful enemy, Ethan must consider that nothing can matter more than his mission—not even the lives of those he cares about most.","poster":"https://media.themoviedb.org/t/p/w500/NNxYkU70HPurnNCSiCjYAmacwm.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/628Dep6AxEtDxjZoGP78TsOxYbK.jpg","rating":7.5,"genres":["Action","Adventure","Thriller"],"trailer":"2m1drlOZSDw"},{"id":976573,"kind":"movie","title":"Elemental","year":2023,"overview":"In a city where fire, water, land and air residents live together, a fiery young woman and a go-with-the-flow guy will discover something elemental: how much they have in common.","poster":"https://media.themoviedb.org/t/p/w500/4Y1WNkd88JXmGfhtWR7dmDAo1T2.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/4fLZUr1e65hKPPVw0R3PmKFKxj1.jpg","rating":7.6,"genres":["Animation","Comedy","Family","Romance"],"trailer":"-cT495xKvvs"},{"id":385687,"kind":"movie","title":"Fast X","year":2023,"overview":"Over many missions and against impossible odds, Dom Toretto and his family have outsmarted, out-nerved and outdriven every foe in their path. Now, they confront the most lethal opponent they've ever faced: A terrifying threat emerging from the shadows of the past who's fueled by blood revenge, and who is determined to shatter this family and destroy everything—and everyone—that Dom loves, forever.","poster":"https://media.themoviedb.org/t/p/w500/fiVW06jE7z9YnO4trhaMEdclSiC.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/4XM8DUTQb3lhLemJC51Jx4a2EuA.jpg","rating":7.0,"genres":["Action","Crime","Thriller"],"trailer":"32RAq6JzY-w"},{"id":447277,"kind":"movie","title":"The Little Mermaid","year":2023,"overview":"The youngest of King Triton’s daughters, and the most defiant, Ariel longs to find out more about the world beyond the sea, and while visiting the surface, falls for the dashing Prince Eric. With mermaids forbidden to interact with humans, Ariel makes a deal with the evil sea witch, Ursula, which gives her a chance to experience life on land, but ultimately places her life – and her father’s crown – in jeopardy.","poster":"https://media.themoviedb.org/t/p/w500/ym1dxyOk4jFcSl4Q2zmRrA5BEEN.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/pbMbDlOAkVuvnxovBA2ENin59xH.jpg","rating":6.2,"genres":["Adventure","Family","Fantasy","Romance"],"trailer":"0-wPm99PF9U"},{"id":1022796,"kind":"movie","title":"Wish","year":2023,"overview":"Asha, a sharp-witted idealist, makes a wish so powerful that it is answered by a cosmic force – a little ball of boundless energy called Star. Together, Asha and Star confront a most formidable foe - the ruler of Rosas, King Magnifico - to save her community and prove that when the will of one courageous human connects with the magic of the stars, wondrous things can happen.","poster":"https://media.themoviedb.org/t/p/w500/nesuSdJakNkf0zs7OfoasB6Clxf.jpg","backdrop":"https://media.themoviedb.org/t/p/w1280/ehumsuIBbgAe1hg343oszCLrAfI.jpg","rating":6.2,"genres":["Animation","Family","Fantasy","Adventure"],"trailer":"ctlz0R1tSZE"}];
+  const featuredNames = ['Dune: Part Two','Oppenheimer','Stranger Things','The Batman','Wednesday','Avatar: The Way of Water','The Last of Us'];
+  const trendingNames = ['Dune: Part Two','Wednesday','Oppenheimer','Stranger Things','The Batman','Inside Out 2','The Last of Us','Deadpool & Wolverine','Fallout','Avatar: The Way of Water','The Bear','Wicked'];
+  const state = {view:'home', genre:'All', hero:0, list:new Set(), timer:null, lastFocus:null};
+  const byTitle = name => catalog.find(item => item.title === name);
+  const featured = featuredNames.map(byTitle).filter(Boolean);
+  const posterPath = item => item.poster;
+  const backdropPath = item => item.backdrop;
+  const app = document.getElementById('app');
+  const modal = document.getElementById('detailModal');
+  const theatre = document.getElementById('theatre');
+  const searchPanel = document.getElementById('searchPanel');
+  const searchShell = document.getElementById('searchShell');
+  const searchInput = document.getElementById('searchInput');
+
+  function icon(name){ return `<svg class="icon" aria-hidden="true"><use href="#i-${name}"></use></svg>`; }
+  function safe(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+  function fallback(img){ img.onerror=null; img.src='data:image/jpeg;base64,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'; img.classList.add('card-fallback'); }
+  window.fallback=fallback;
+
+  function card(item){
+    const listed=state.list.has(item.id);
+    return `<article class="card" data-id="${item.id}" tabindex="0" role="button" aria-haspopup="dialog" aria-label="${safe(item.title)}, ${item.year}">
+      <img src="${posterPath(item)}" alt="${safe(item.title)} poster" loading="lazy" onerror="fallback(this)">
+      <div class="card-info"><h3 class="card-title">${safe(item.title)}</h3><div class="card-meta"><span class="match">${Math.round(item.rating*10)}% Match</span><span>${item.year}</span></div>
+      <div class="card-actions">
+        ${item.trailer?`<button class="round-btn" data-action="play" aria-label="Play ${safe(item.title)} trailer">${icon('play')}</button>`:''}
+        <button class="round-btn ${listed?'in-list':''}" data-action="list" aria-label="${listed?'Remove from':'Add to'} My List">${icon(listed?'check':'plus')}</button>
+        <button class="round-btn" data-action="detail" aria-label="More information about ${safe(item.title)}">${icon('info')}</button>
+      </div></div></article>`;
+  }
+  function topCard(item,index){ return `<div class="top-card"><div class="rank" aria-hidden="true">${index+1}</div>${card(item)}</div>`; }
+  function shelf(title, items, top=false){
+    if(!items.length) return '';
+    const id='rail-'+title.toLowerCase().replace(/[^a-z0-9]+/g,'-');
+    return `<section class="shelf"><div class="shelf-heading"><h2>${safe(title)}</h2><span class="shelf-count">${items.length} titles</span></div><div class="rail-wrap">
+      <button class="rail-arrow prev" data-scroll="-1" aria-label="Scroll ${safe(title)} left">${icon('left')}</button>
+      <div class="rail" id="${id}">${items.map((x,i)=>top?topCard(x,i):card(x)).join('')}</div>
+      <button class="rail-arrow next" data-scroll="1" aria-label="Scroll ${safe(title)} right">${icon('right')}</button>
+    </div></section>`;
+  }
+  function sorted(filter){ return catalog.filter(filter).slice().sort((a,b)=>b.rating-a.rating || b.year-a.year); }
+  function rowData(){
+    return [
+      ['Trending Now',trendingNames.map(byTitle).filter(Boolean),false],
+      ['Top 10 Today',sorted(()=>true).slice(0,10),true],
+      ['Popular Movies',sorted(x=>x.kind==='movie').slice(0,14),false],
+      ['Popular TV Shows',sorted(x=>x.kind==='tv'),false],
+      ['Action & Adventure',sorted(x=>x.genres.some(g=>['Action','Adventure','Action Adventure'].includes(g))).slice(0,16),false],
+      ['Sci-Fi & Fantasy',sorted(x=>x.genres.some(g=>['Science Fiction','Sci Fi Fantasy','Fantasy'].includes(g))).slice(0,16),false],
+      ['Comedies',sorted(x=>x.genres.includes('Comedy')).slice(0,14),false],
+      ['Animation & Family',sorted(x=>x.genres.some(g=>['Animation','Family'].includes(g))).slice(0,14),false],
+      ['Critically Acclaimed',sorted(x=>x.rating>=8).slice(0,16),false]
+    ];
+  }
+  function heroMarkup(){
+    const item=featured[state.hero];
+    return `<section class="hero" aria-label="Featured: ${safe(item.title)}">
+      <div class="hero-media"><img src="${backdropPath(item)}" alt="Scene from ${safe(item.title)}" onerror="fallback(this)"></div>
+      <div class="hero-copy"><div class="hero-kicker">Featured ${item.kind==='tv'?'series':'film'}</div><h1>${safe(item.title)}</h1>
+        <div class="hero-meta"><span class="match">${Math.round(item.rating*10)}% Match</span><span>${item.year}</span><span class="age">${item.kind==='tv'?'Series':'Film'}</span></div>
+        <p class="hero-overview">${safe(item.overview)}</p><div class="actions">
+          ${item.trailer?`<button class="btn btn-primary" data-id="${item.id}" data-action="play">${icon('play')} Play trailer</button>`:''}
+          <button class="btn btn-secondary" data-id="${item.id}" data-action="detail">${icon('info')} More info</button>
+        </div></div>
+      <div class="hero-controls"><button class="hero-arrow" data-hero="-1" aria-label="Previous feature">${icon('left')}</button>
+        <div class="dots">${featured.map((_,i)=>`<button class="dot ${i===state.hero?'active':''}" data-hero-index="${i}" aria-label="Show feature ${i+1}"></button>`).join('')}</div>
+        <button class="hero-arrow" data-hero="1" aria-label="Next feature">${icon('right')}</button></div>
+    </section>`;
+  }
+  function footer(){return `<footer><span>Title metadata and imagery: <a href="https://www.themoviedb.org/" target="_blank" rel="noopener">TMDB</a>. Trailers: <a href="https://www.youtube.com/" target="_blank" rel="noopener">YouTube</a>.</span><span>Demo discovery interface. Not affiliated with Netflix.</span></footer>`;}
+  function renderHome(){
+    app.innerHTML=heroMarkup()+`<main class="content"><div class="rows">${rowData().map(r=>shelf(...r)).join('')}</div></main>`+footer();
+    restartHero();
+  }
+  function genresFor(kind){return ['All',...Array.from(new Set(catalog.filter(x=>x.kind===kind).flatMap(x=>x.genres))).sort()];}
+  function renderCatalog(kind){
+    stopHero(); const label=kind==='movie'?'Movies':'TV Shows'; const all=catalog.filter(x=>x.kind===kind); const items=state.genre==='All'?all:all.filter(x=>x.genres.includes(state.genre));
+    app.innerHTML=`<main><header class="view-head"><h1>${label}</h1><p>Browse ${all.length} titles and filter by genre.</p><div class="chips">${genresFor(kind).map(g=>`<button class="chip ${g===state.genre?'active':''}" data-genre="${safe(g)}">${safe(g)}</button>`).join('')}</div></header><div class="grid-view">${items.map(card).join('')}</div></main>`+footer();
+  }
+  function renderList(){
+    stopHero(); const items=catalog.filter(x=>state.list.has(x.id));
+    app.innerHTML=`<main><header class="view-head"><h1>My List</h1><p class="reduced-note">Demo: your list resets when you reload the page</p></header>${items.length?`<div class="grid-view">${items.map(card).join('')}</div>`:`<div class="empty"><strong>Your list is ready for a first pick.</strong>Use the + button on any title to add it here for this visit.</div>`}</main>`+footer();
+  }
+  function render(){
+    document.querySelectorAll('.nav-link').forEach(b=>b.classList.toggle('active',b.dataset.view===state.view));
+    if(state.view==='home') renderHome(); else if(state.view==='list') renderList(); else renderCatalog(state.view);
+    window.scrollTo({top:0,behavior:'instant'});
+  }
+  function setHero(index){state.hero=(index+featured.length)%featured.length;if(state.view==='home')renderHome();}
+  function restartHero(){stopHero();if(!matchMedia('(prefers-reduced-motion: reduce)').matches)state.timer=setInterval(()=>setHero(state.hero+1),6500);}
+  function stopHero(){if(state.timer){clearInterval(state.timer);state.timer=null;}}
+  function titleById(id){return catalog.find(x=>x.id===Number(id));}
+  function updateList(item){state.list.has(item.id)?state.list.delete(item.id):state.list.add(item.id); if(state.view==='list')renderList(); else document.querySelectorAll(`.card[data-id="${item.id}"]`).forEach(el=>{const b=el.querySelector('[data-action="list"]');if(b){const on=state.list.has(item.id);b.classList.toggle('in-list',on);b.innerHTML=icon(on?'check':'plus');b.setAttribute('aria-label',`${on?'Remove from':'Add to'} My List`);}});}
+  function trailerURL(id,autoplay=false){return `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?rel=0&modestbranding=1${autoplay?'&autoplay=1':''}`;}
+  function openDetail(item){
+    const active=document.activeElement;
+    state.lastFocus=active?.closest?.('.card')||active; stopHero();
+    const media=item.trailer?`<iframe src="${trailerURL(item.trailer)}" title="${safe(item.title)} trailer" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`:`<img src="${posterPath(item)}" alt="${safe(item.title)} poster" onerror="fallback(this)">`;
+    const listed=state.list.has(item.id);
+    document.getElementById('modalCard').innerHTML=`<div class="modal-media">${media}<button class="close-btn" data-close="modal" aria-label="Close details">${icon('x')}</button></div><div class="modal-body"><div><h2 id="modalTitle">${safe(item.title)}</h2><div class="modal-meta"><span class="match">${Math.round(item.rating*10)}% Match</span><span>${item.year}</span><span>${item.kind==='tv'?'Series':'Film'}</span></div><p class="modal-overview">${safe(item.overview)}</p><div class="actions"><button class="btn btn-accent" data-id="${item.id}" data-action="list">${icon(listed?'check':'plus')} ${listed?'In My List':'My List'}</button>${item.trailer?`<button class="btn btn-secondary" data-id="${item.id}" data-action="theatre">${icon('theatre')} 3D Theatre</button>`:''}</div></div><aside><div class="label">Genres</div><div class="genre-list">${item.genres.map(g=>`<span class="genre-tag">${safe(g)}</span>`).join('')}</div></aside></div>`;
+    modal.classList.add('open'); document.body.style.overflow='hidden'; setTimeout(()=>modal.querySelector('.close-btn').focus(),0);
+  }
+  function restoreOpeningFocus(){
+    const target=state.lastFocus;
+    if(target?.isConnected){target.focus({preventScroll:true});target.scrollIntoView({block:'center',inline:'center'});}
+  }
+  function closeModal(resume=true){modal.classList.remove('open');document.getElementById('modalCard').innerHTML='';document.body.style.overflow='';if(resume&&state.view==='home')restartHero();if(resume)restoreOpeningFocus();}
+  function openTheatre(item){
+    if(!item.trailer)return;
+    if(!modal.classList.contains('open'))state.lastFocus=document.activeElement?.closest?.('.card')||document.activeElement;
+    closeModal(false); stopHero(); document.getElementById('theatreLabel').textContent=`Now playing · ${item.title}`;
+    document.getElementById('screenWrap').innerHTML=`<iframe src="${trailerURL(item.trailer,true)}" title="${safe(item.title)} trailer in theatre mode" allow="autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
+    theatre.classList.add('open');document.body.style.overflow='hidden';document.getElementById('theatreClose').focus();
+    if(theatre.requestFullscreen) theatre.requestFullscreen().catch(()=>{});
+  }
+  function closeTheatre(){theatre.classList.remove('open');document.getElementById('screenWrap').innerHTML='';document.body.style.overflow='';if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});if(state.view==='home')restartHero();restoreOpeningFocus();}
+  function openSearch(){searchShell.classList.add('open');searchPanel.classList.add('open');document.getElementById('searchToggle').setAttribute('aria-expanded','true');searchInput.tabIndex=0;searchInput.focus();doSearch();}
+  function closeSearch(restore=false){searchShell.classList.remove('open');searchPanel.classList.remove('open');document.getElementById('searchToggle').setAttribute('aria-expanded','false');searchInput.tabIndex=-1;searchInput.value='';document.getElementById('searchGrid').innerHTML='';if(restore)document.getElementById('searchToggle').focus();}
+  function doSearch(){
+    const q=searchInput.value.trim().toLowerCase(); const found=q?catalog.filter(x=>[x.title,x.year,...x.genres].join(' ').toLowerCase().includes(q)):catalog.slice(0,8);
+    document.getElementById('searchSummary').textContent=q?`${found.length} result${found.length===1?'':'s'} for “${searchInput.value.trim()}”`:'Popular searches';
+    document.getElementById('searchGrid').innerHTML=found.length?found.slice(0,18).map(card).join(''):`<div class="empty"><strong>No titles found.</strong>Try a title, genre, or year.</div>`;
+  }
+  function isRemoteFocusable(el){
+    if(!el||el.disabled||el.getAttribute('aria-hidden')==='true'||el.tabIndex<0)return false;
+    const style=getComputedStyle(el);
+    return style.display!=='none'&&style.visibility!=='hidden'&&el.getClientRects().length>0;
+  }
+  function inActiveLayer(el){
+    if(theatre.classList.contains('open'))return theatre.contains(el);
+    if(modal.classList.contains('open'))return modal.contains(el);
+    if(searchPanel.classList.contains('open'))return searchShell.contains(el)||searchPanel.contains(el);
+    return true;
+  }
+  function remoteFocusables(){
+    return Array.from(document.querySelectorAll('button,input,a[href],.card[tabindex]')).filter(el=>isRemoteFocusable(el)&&inActiveLayer(el));
+  }
+  function focusRemoteTarget(target){
+    if(!target)return false;
+    target.focus({preventScroll:true});
+    target.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center',inline:'center'});
+    return true;
+  }
+  function moveCardAlongRail(cardEl,direction){
+    if(direction!=='left'&&direction!=='right')return false;
+    const rail=cardEl.closest('.rail');
+    if(!rail)return false;
+    const cards=Array.from(rail.querySelectorAll('.card')).filter(isRemoteFocusable);
+    const next=cards[cards.indexOf(cardEl)+(direction==='right'?1:-1)];
+    return focusRemoteTarget(next);
+  }
+  function moveSpatial(current,direction){
+    if(current?.matches('.card')&&moveCardAlongRail(current,direction))return true;
+    let candidates=remoteFocusables().filter(el=>el!==current);
+    if(current?.matches('.card'))candidates=candidates.filter(el=>!el.closest('.card')||el.matches('.card'));
+    const from=(current&&isRemoteFocusable(current)?current:document.querySelector('.nav-link'));
+    if(!from)return false;
+    const a=from.getBoundingClientRect();
+    const ax=a.left+a.width/2, ay=a.top+a.height/2;
+    let best=null,bestScore=Infinity;
+    candidates.forEach(el=>{
+      const b=el.getBoundingClientRect();
+      const bx=b.left+b.width/2, by=b.top+b.height/2;
+      const dx=bx-ax,dy=by-ay;
+      const primary=direction==='left'?-dx:direction==='right'?dx:direction==='up'?-dy:dy;
+      const secondary=(direction==='left'||direction==='right')?Math.abs(dy):Math.abs(dx);
+      if(primary<=5)return;
+      const score=primary+secondary*(direction==='left'||direction==='right'?2.2:.45);
+      if(score<bestScore){best=el;bestScore=score;}
+    });
+    return focusRemoteTarget(best);
+  }
+  function trapTab(e){
+    const items=remoteFocusables();
+    if(!items.length)return;
+    const index=items.indexOf(document.activeElement);
+    if(e.shiftKey&&(index<=0)){e.preventDefault();items[items.length-1].focus();}
+    else if(!e.shiftKey&&(index===items.length-1||index<0)){e.preventDefault();items[0].focus();}
+  }
+  document.addEventListener('focusin',e=>{if(e.target.closest('#app'))stopHero();});
+  document.addEventListener('click',e=>{
+    const nav=e.target.closest('[data-view]'); if(nav){state.view=nav.dataset.view;state.genre='All';closeSearch();render();return;}
+    const genre=e.target.closest('[data-genre]'); if(genre){state.genre=genre.dataset.genre;renderCatalog(state.view);return;}
+    const h=e.target.closest('[data-hero]'); if(h){setHero(state.hero+Number(h.dataset.hero));return;}
+    const hi=e.target.closest('[data-hero-index]'); if(hi){setHero(Number(hi.dataset.heroIndex));return;}
+    const scroll=e.target.closest('[data-scroll]'); if(scroll){scroll.parentElement.querySelector('.rail').scrollBy({left:Number(scroll.dataset.scroll)*innerWidth*.72,behavior:'smooth'});return;}
+    const action=e.target.closest('[data-action]');
+    if(action){const container=action.closest('[data-id]');const item=titleById(action.dataset.id||container?.dataset.id);if(!item)return;if(action.dataset.action==='list')updateList(item);if(action.dataset.action==='detail')openDetail(item);if(action.dataset.action==='play')openTheatre(item);if(action.dataset.action==='theatre')openTheatre(item);return;}
+    if(e.target.closest('[data-close="modal"]')||e.target===modal)closeModal();
+  });
+  document.addEventListener('keydown',e=>{
+    const keyCode=e.keyCode||e.which;
+    const backKey=['Escape','Esc','Back','GoBack','BrowserBack'].includes(e.key)||[27,461,10009].includes(keyCode)||(keyCode===8&&!e.target.matches('input'));
+    if(backKey){
+      if(theatre.classList.contains('open')){e.preventDefault();closeTheatre();return;}
+      if(modal.classList.contains('open')){e.preventDefault();closeModal();return;}
+      if(searchShell.classList.contains('open')){e.preventDefault();closeSearch(true);return;}
+    }
+    if(e.key==='Tab'&&(theatre.classList.contains('open')||modal.classList.contains('open'))){trapTab(e);return;}
+    const direction={ArrowLeft:'left',Left:'left',ArrowRight:'right',Right:'right',ArrowUp:'up',Up:'up',ArrowDown:'down',Down:'down'}[e.key]||({37:'left',38:'up',39:'right',40:'down'}[keyCode]);
+    if(direction){
+      if(e.target===searchInput&&(direction==='left'||direction==='right'))return;
+      e.preventDefault();moveSpatial(document.activeElement,direction);return;
+    }
+    const okKey=e.key==='Enter'||e.key==='OK'||e.key==='Select'||e.key==='Accept'||keyCode===13;
+    if(okKey){
+      const cardEl=e.target.closest('.card');
+      if(cardEl&&!e.target.closest('button')){e.preventDefault();openDetail(titleById(cardEl.dataset.id));return;}
+      if(e.key!=='Enter'&&e.target.matches('button,a[href]')){e.preventDefault();e.target.click();}
+    }
+  });
+  document.getElementById('searchToggle').addEventListener('click',()=>searchShell.classList.contains('open')?closeSearch():openSearch());
+  searchInput.addEventListener('input',doSearch);
+  document.getElementById('theatreClose').addEventListener('click',closeTheatre);
+  window.addEventListener('scroll',()=>document.getElementById('nav').classList.toggle('solid',scrollY>24),{passive:true});
+  document.addEventListener('visibilitychange',()=>document.hidden?stopHero():(state.view==='home'&&restartHero()));
+  render();
+  </script>
+</body>
+</html>
